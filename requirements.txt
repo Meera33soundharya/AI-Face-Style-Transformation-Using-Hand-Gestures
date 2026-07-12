@@ -1,0 +1,6 @@
+opencv-python
+numpy
+mediapipe
+pillow
+python-dotenv
+huggingface_hub>=0.24.0

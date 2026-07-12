@@ -1,0 +1,47 @@
+/* Studio-specific styles */
+
+/* Hide scrollbar for style carousel */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Hologram card pulse animation */
+@keyframes card-pulse {
+  0%, 100% { box-shadow: 6px 10px 15px rgba(0,0,0,0.4), 0 0 30px rgba(255,255,255,0.08); }
+  50%        { box-shadow: 6px 10px 20px rgba(0,0,0,0.5), 0 0 50px rgba(255,255,255,0.18); }
+}
+.card-pulse {
+  animation: card-pulse 2.5s ease-in-out infinite;
+}
+
+/* Scanline flicker */
+@keyframes scanline {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+.scanlines {
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+  );
+  animation: scanline 4s linear infinite;
+}
+
+/* Style button glow pulse for active item */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.7; }
+}
+.style-btn-active {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Base custom classes */
+.px-1\/2-screen {
+  padding-left: 50%;
+  padding-right: 50%;
+}
