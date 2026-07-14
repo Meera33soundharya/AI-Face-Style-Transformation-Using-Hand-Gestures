@@ -13,6 +13,7 @@ import { NotFoundPage } from "./pages/Errors/NotFoundPage";
 // Studio
 import { GestureStudio } from "./pages/Studio/GestureStudio";
 import { EyeBlinkStudio } from "./pages/Studio/EyeBlinkStudio";
+import { BlinkStudio } from "./pages/Studio/BlinkStudio";
 
 // Protected Route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -53,6 +54,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <EyeBlinkStudio />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/studio/blink"
+          element={
+            <ProtectedRoute>
+              <BlinkStudio />
             </ProtectedRoute>
           }
         />

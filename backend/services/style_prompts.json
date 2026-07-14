@@ -6,19 +6,19 @@
     "lighting": "soft anime rim lighting, warm fill light, expressive cel-shaded shadows",
     "description": "Japanese anime illustration with expressive eyes, cel shading, and vibrant animation style."
   },
+  "Pixar": {
+    "style": "Pixar and DreamWorks 3D animated movie character, high-quality CGI render",
+    "color": "bright cheerful stylized colors, smooth color gradients, subsurface skin scattering glow",
+    "texture": "smooth 3D render, subsurface scattering skin, glossy expressive eyes, soft cloth simulation",
+    "lighting": "soft cinematic three-point studio lighting, ambient occlusion, movie-quality rendering",
+    "description": "Pixar 3D animated movie character with smooth textures, expressive features, and cinematic lighting."
+  },
   "Van Gogh": {
     "style": "Vincent van Gogh post-impressionist oil painting, Starry Night style",
     "color": "warm golden yellows, deep cobalt blues, emerald greens, swirling complementary color contrasts",
     "texture": "thick impasto brushstrokes, visible paint ridges, swirling turbulent patterns, textured canvas weave",
     "lighting": "dramatic directional warm candlelight, deep expressive shadows",
     "description": "Impressionist oil painting with thick textured brush strokes, swirling patterns, and rich blue and yellow colors."
-  },
-  "Neon": {
-    "style": "futuristic neon holographic artwork, synthwave aesthetic",
-    "color": "electric magenta, cyan, and purple neon glows on near-black background, holographic iridescent reflections",
-    "texture": "glossy synthetic skin, glowing neon light trails, holographic foil texture, chromatic aberration edges",
-    "lighting": "intense neon rim lighting, glowing contour highlights, deep dark shadows with colored light spill",
-    "description": "Futuristic neon artwork with glowing blue, pink, and purple lights, holographic reflections, and cyber aesthetics."
   },
   "Pop Art": {
     "style": "Andy Warhol pop art screen print, Roy Lichtenstein comic style",
@@ -34,6 +34,13 @@
     "lighting": "urban outdoor daylight, harsh shadows, street atmosphere",
     "description": "Urban street art with spray paint textures, colorful murals, brick wall effects, and stencil painting."
   },
+  "Cyberpunk": {
+    "style": "Cyberpunk 2077 sci-fi cinematic portrait, futuristic dystopian city",
+    "color": "neon city colors, electric blue, hot pink, acid yellow, dark rainy atmosphere",
+    "texture": "high-tech metallic implants, synthetic skin, holographic HUD overlays, rain-slicked surfaces",
+    "lighting": "rainy neon city atmospheric lighting, colored light spill from signs, volumetric fog",
+    "description": "Futuristic sci-fi portrait with neon lighting, holograms, advanced technology, and rainy city atmosphere."
+  },
   "Watercolor": {
     "style": "expressive fine art watercolor painting on textured paper",
     "color": "soft translucent pastel washes, wet-on-wet color blooms, delicate pigment gradients",
@@ -48,13 +55,6 @@
     "lighting": "dramatic high contrast chiaroscuro, deep shadows, bright highlights",
     "description": "Realistic graphite sketch with detailed pencil shading, monochrome drawing, and textured paper."
   },
-  "Cyberpunk": {
-    "style": "Cyberpunk 2077 sci-fi cinematic portrait, futuristic dystopian city",
-    "color": "neon city colors, electric blue, hot pink, acid yellow, dark rainy atmosphere",
-    "texture": "high-tech metallic implants, synthetic skin, holographic HUD overlays, rain-slicked surfaces",
-    "lighting": "rainy neon city atmospheric lighting, colored light spill from signs, volumetric fog",
-    "description": "Futuristic sci-fi portrait with neon lighting, holograms, advanced technology, and rainy city atmosphere."
-  },
   "Oil Painting": {
     "style": "classical Renaissance oil painting, Rembrandt and Vermeer style",
     "color": "rich deep earthy tones, warm ochres, burnt siennas, deep umbers, ivory highlights",
@@ -62,19 +62,12 @@
     "lighting": "chiaroscuro dramatic lighting, single warm light source, deep velvety shadows",
     "description": "Classical oil painting with realistic brushwork, rich canvas textures, dramatic lighting, and museum-quality artwork."
   },
-  "Comic Book": {
-    "style": "Marvel and DC comic book illustration, graphic novel art",
-    "color": "bold vibrant primary colors, dynamic color contrasts, flat color fills with cel shading",
-    "texture": "thick black ink outlines, halftone dot shading, dynamic action lines, inked crosshatching",
-    "lighting": "flat dramatic panel lighting, strong rim light, graphic shadow shapes",
-    "description": "Bold comic illustration with black ink outlines, dynamic shadows, graphic novel style, and vibrant comic colors."
-  },
-  "Fantasy": {
-    "style": "epic high fantasy concept art, magical portrait painting",
-    "color": "rich jewel tones, deep purples, emerald greens, gold accents, magical glowing particle effects",
-    "texture": "detailed painterly digital art, magical energy aura, glowing runes, ethereal particle effects",
-    "lighting": "ethereal magical rim lighting, mystical bioluminescent glow, cinematic epic atmosphere",
-    "description": "Magical fantasy artwork with glowing effects, enchanted environments, mystical lighting, and epic cinematic atmosphere."
+  "3D Cartoon": {
+    "style": "high-quality 3D animated cartoon character, DreamWorks style",
+    "color": "bright cheerful stylized colors, vivid saturated palette, smooth color transitions",
+    "texture": "smooth 3D render plasticine texture, rounded soft edges, glossy surface highlights",
+    "lighting": "soft cinematic studio lighting, warm key light, gentle fill shadows",
+    "description": "High-quality animated 3D character with smooth textures, expressive features, and movie-quality rendering."
   },
   "Clay Art": {
     "style": "handmade clay sculpture, Claymation stop-motion animation style",
@@ -83,32 +76,39 @@
     "lighting": "soft studio diffused lighting, gentle fill light, subtle clay surface sheen",
     "description": "Handmade clay sculpture appearance with realistic clay texture, rounded shapes, and studio lighting."
   },
-  "Pixel Art": {
-    "style": "retro 8-bit and 16-bit pixel art, arcade game sprite style",
-    "color": "limited retro arcade color palette, bright saturated pixel colors, dithering patterns",
-    "texture": "sharp square pixel grid, no anti-aliasing, visible pixel blocks, retro sprite shading",
-    "lighting": "flat 2D sprite lighting, simple highlight and shadow pixel blocks",
-    "description": "Retro 8-bit pixel artwork with colorful square pixels, arcade game aesthetics, and nostalgic digital style."
+  "Neon": {
+    "style": "futuristic neon holographic artwork, synthwave aesthetic",
+    "color": "electric magenta, cyan, and purple neon glows on near-black background, holographic iridescent reflections",
+    "texture": "glossy synthetic skin, glowing neon light trails, holographic foil texture, chromatic aberration edges",
+    "lighting": "intense neon rim lighting, glowing contour highlights, deep dark shadows with colored light spill",
+    "description": "Futuristic neon artwork with glowing blue, pink, and purple lights, holographic reflections, and cyber aesthetics."
   },
-  "3D Cartoon": {
-    "style": "Pixar and DreamWorks 3D animated movie character, high-quality CGI render",
-    "color": "bright cheerful stylized colors, smooth color gradients, subsurface skin scattering",
-    "texture": "smooth 3D render, subsurface scattering skin, glossy eyes, soft cloth simulation",
-    "lighting": "soft cinematic three-point studio lighting, ambient occlusion, movie-quality rendering",
-    "description": "High-quality animated 3D character with smooth textures, expressive features, soft lighting, and movie-quality rendering."
-  },
-  "Digital Painting": {
-    "style": "professional digital concept art, ArtStation and CGSociety masterpiece quality",
-    "color": "vibrant rich color palette, deep dramatic shadows, luminous highlights, cinematic color grading",
-    "texture": "smooth digital brush strokes, ultra-detailed skin pores, realistic hair strands, fabric weave",
-    "lighting": "cinematic three-point lighting, dramatic key light, colored rim light, professional studio setup",
-    "description": "Professional digital artwork with cinematic lighting, realistic brushwork, ultra-detailed textures, and concept art quality."
-  },
-  "Low Poly Art": {
+  "Low Poly": {
     "style": "modern low poly geometric art, triangulated polygon mesh portrait",
     "color": "clean flat geometric color fills, vibrant gradient polygon faces, bold color contrasts",
     "texture": "triangulated polygon mesh surface, flat shaded facets, sharp angular edges, geometric abstraction",
     "lighting": "flat minimalist directional lighting, clean polygon shadow facets",
     "description": "Modern geometric artwork created from colorful polygon shapes with clean angular surfaces and vibrant gradients."
+  },
+  "Fantasy": {
+    "style": "epic high fantasy concept art, magical portrait painting",
+    "color": "rich jewel tones, deep purples, emerald greens, gold accents, magical glowing particle effects",
+    "texture": "detailed painterly digital art, magical energy aura, glowing runes, ethereal particle effects",
+    "lighting": "ethereal magical rim lighting, mystical bioluminescent glow, cinematic epic atmosphere",
+    "description": "Magical fantasy artwork with glowing effects, enchanted environments, mystical lighting, and epic cinematic atmosphere."
+  },
+  "Comic": {
+    "style": "Marvel and DC comic book illustration, graphic novel art",
+    "color": "bold vibrant primary colors, dynamic color contrasts, flat color fills with cel shading",
+    "texture": "thick black ink outlines, halftone dot shading, dynamic action lines, inked crosshatching",
+    "lighting": "flat dramatic panel lighting, strong rim light, graphic shadow shapes",
+    "description": "Bold comic illustration with black ink outlines, dynamic shadows, graphic novel style, and vibrant comic colors."
+  },
+  "Ghibli": {
+    "style": "Studio Ghibli hand-painted animation, Hayao Miyazaki watercolor style",
+    "color": "soft natural greens, warm sky blues, gentle earth tones, luminous pastel highlights",
+    "texture": "hand-painted watercolor washes, soft pencil outlines, natural organic textures, gentle color gradients",
+    "lighting": "warm golden hour sunlight, soft diffused natural lighting, gentle atmospheric haze",
+    "description": "Studio Ghibli hand-painted watercolor animation with warm natural tones and gentle organic textures."
   }
 }
