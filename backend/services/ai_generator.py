@@ -12,7 +12,7 @@ from services.style_prompts import get_negative_prompt, get_prompt_for_style
 
 HF_API_URL = (
     "https://api-inference.huggingface.co/models/"
-    "black-forest-labs/FLUX.2-klein-4B"
+    "black-forest-labs/FLUX.1-schnell"
 )
 
 
@@ -47,8 +47,11 @@ async def generate_styled_image(
 
     prompt = get_prompt_for_style(
         request.style,
-        "A highly detailed close up portrait of a person's face, "
-        "preserving identity, front facing, plain white background.",
+        f"Transform this face into {request.style} art style. "
+        "Preserve the person's facial identity, facial structure, "
+        "hairstyle, eye shape, expression, and skin tone exactly. "
+        "Close-up portrait, front-facing, high detail, "
+        "plain background.",
     )
 
     if not token or token == "your_huggingface_token_here":
@@ -96,7 +99,7 @@ async def generate_styled_image(
     if request.init_image:
         payload["parameters"]["image"] = base64_image
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
         try:
             response = await client.post(
                 HF_API_URL,

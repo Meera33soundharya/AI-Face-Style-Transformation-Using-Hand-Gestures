@@ -25,6 +25,9 @@ export const useEyeBlink = (videoRef: React.RefObject<HTMLVideoElement | null>) 
   const [isBlinking, setIsBlinking] = useState(false);
   const [faceResult, setFaceResult] = useState<FaceLandmarkerResult | null>(null);
 
+  // Expose latest faceResult as a ref so consumers can read it synchronously
+  const faceResultRef = useRef<FaceLandmarkerResult | null>(null);
+
   const landmarkerRef = useRef<FaceLandmarker | null>(null);
   const rafRef = useRef<number>(0);
   const lastVideoTimeRef = useRef<number>(-1);
@@ -74,6 +77,7 @@ export const useEyeBlink = (videoRef: React.RefObject<HTMLVideoElement | null>) 
 
       if (landmarks && landmarks.length >= 468) {
         setHasFace(true);
+        faceResultRef.current = result;
         setFaceResult(result);
 
         const leftEAR  = ear(landmarks, LEFT_EYE);
@@ -93,6 +97,7 @@ export const useEyeBlink = (videoRef: React.RefObject<HTMLVideoElement | null>) 
         eyesClosedRef.current = closed;
       } else {
         setHasFace(false);
+        faceResultRef.current = null;
         setFaceResult(null);
         eyesClosedRef.current = false;
       }
@@ -107,5 +112,5 @@ export const useEyeBlink = (videoRef: React.RefObject<HTMLVideoElement | null>) 
     return () => cancelAnimationFrame(rafRef.current);
   }, [isReady, detectFrame]);
 
-  return { isReady, hasFace, isBlinking, faceResult };
+  return { isReady, hasFace, isBlinking, faceResult, faceResultRef };
 };
