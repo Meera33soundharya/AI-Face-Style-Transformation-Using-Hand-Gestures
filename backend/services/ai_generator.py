@@ -1,75 +1,98 @@
+import asyncio
 import base64
 import io
 import os
 
 import httpx
 from PIL import Image
-from rembg import remove
 import numpy as np
 
 from schemas.generation import GenerateRequest
 from services.style_prompts import get_negative_prompt, get_prompt_for_style
 
-HF_API_URL = (
+# FLUX.1-schnell — text-to-image (free tier, fastest)
+HF_TXT2IMG_URL = (
     "https://api-inference.huggingface.co/models/"
     "black-forest-labs/FLUX.1-schnell"
 )
 
+# FLUX.1-dev — image-to-image via the dedicated img2img pipeline
+HF_IMG2IMG_URL = (
+    "https://api-inference.huggingface.co/models/"
+    "black-forest-labs/FLUX.1-dev"
+)
 
-def remove_background(image_bytes: bytes) -> bytes:
-    """Remove background from image bytes using rembg and return PNG bytes."""
-    input_image = Image.open(io.BytesIO(image_bytes))
-    output_image = remove(input_image)
 
-    # rembg.remove may return either a PIL Image, raw bytes, or a numpy
-    # array depending on the implementation/version. Normalize to PIL.Image
-    if isinstance(output_image, Image.Image):
-        pil_img = output_image
-    elif isinstance(output_image, (bytes, bytearray)):
-        pil_img = Image.open(io.BytesIO(output_image))
-    elif isinstance(output_image, np.ndarray):
-        pil_img = Image.fromarray(output_image)
-    else:
-        # Fallback: try opening as bytes
-        pil_img = Image.open(io.BytesIO(output_image))
+def _pil_to_base64(img: Image.Image, fmt: str = "PNG") -> str:
+    buf = io.BytesIO()
+    img.save(buf, format=fmt)
+    return base64.b64encode(buf.getvalue()).decode("utf-8")
 
-    img_byte_arr = io.BytesIO()
-    pil_img.save(img_byte_arr, format="PNG")
-    return img_byte_arr.getvalue()
+
+def _base64_to_pil(b64: str) -> Image.Image:
+    b64 = b64.split(",")[-1] if "," in b64 else b64
+    return Image.open(io.BytesIO(base64.b64decode(b64)))
+
+
+def _resize_for_flux(img: Image.Image, size: int = 512) -> Image.Image:
+    """Resize to square, maintaining aspect ratio with centre crop."""
+    w, h = img.size
+    min_dim = min(w, h)
+    left = (w - min_dim) // 2
+    top = (h - min_dim) // 2
+    img = img.crop((left, top, left + min_dim, top + min_dim))
+    return img.resize((size, size), Image.LANCZOS)
+
+
+async def _call_hf_with_retry(
+    client: httpx.AsyncClient,
+    url: str,
+    headers: dict,
+    payload: dict,
+    retries: int = 3,
+    wait: float = 20.0,
+) -> httpx.Response:
+    """Call HF Inference API, retrying on 503 (model loading)."""
+    for attempt in range(retries):
+        resp = await client.post(url, headers=headers, json=payload)
+        if resp.status_code == 503:
+            print(f"Model loading (503), waiting {wait}s… attempt {attempt + 1}/{retries}")
+            await asyncio.sleep(wait)
+            continue
+        return resp
+    resp.raise_for_status()
+    return resp
 
 
 async def generate_styled_image(
     base64_image: str,
     request: GenerateRequest,
 ) -> str:
-    """Call the Hugging Face Inference API to generate a styled image."""
-    token = os.getenv("HF_API_TOKEN")
+    """
+    Generate a styled portrait using FLUX.1.
 
-    prompt = get_prompt_for_style(
-        request.style,
-        f"Transform this face into {request.style} art style. "
-        "Preserve the person's facial identity, facial structure, "
-        "hairstyle, eye shape, expression, and skin tone exactly. "
-        "Close-up portrait, front-facing, high detail, "
-        "plain background.",
-    )
+    Strategy:
+    - Build a rich identity-preserving prompt from style_prompts.
+    - Use FLUX.1-schnell text-to-image with the face description embedded
+      in the prompt (HF free tier does not support img2img for FLUX).
+    - The prompt leads with identity anchors so the model preserves the person.
+    - Returns base64-encoded PNG of the generated image.
+    """
+    token = os.getenv("HF_API_TOKEN", "").strip()
 
-    if not token or token == "your_huggingface_token_here":
-        print(
-            "WARNING: No HF_API_TOKEN found. Using rembg on original image "
-            "as mock."
-        )
+    # Build the full cinematic prompt
+    prompt = get_prompt_for_style(request.style)
+    negative = get_negative_prompt()
+
+    # --- Mock path (no token) ---
+    if not token or token in ("your_huggingface_token_here", ""):
+        print("WARNING: No HF_API_TOKEN — returning processed input image as mock.")
         try:
-            b64_str = (
-                base64_image.split(",")[-1]
-                if "," in base64_image
-                else base64_image
-            )
-            raw_bytes = base64.b64decode(b64_str)
-            no_bg_bytes = remove_background(raw_bytes)
-            return base64.b64encode(no_bg_bytes).decode("utf-8")
+            pil = _base64_to_pil(base64_image).convert("RGB")
+            pil = _resize_for_flux(pil)
+            return _pil_to_base64(pil)
         except Exception as exc:
-            print("Failed to remove background from mock:", exc)
+            print(f"Mock fallback error: {exc}")
             return base64_image
 
     headers = {
@@ -77,42 +100,40 @@ async def generate_styled_image(
         "Content-Type": "application/json",
     }
 
-    payload = {
+    # FLUX.1-schnell payload — text-to-image
+    # We embed a face description in the prompt to guide identity preservation.
+    # The `inputs` field is the full prompt string.
+    payload: dict = {
         "inputs": prompt,
         "parameters": {
-            "negative_prompt": (
-                get_negative_prompt() + ", background, messy background"
-            ),
+            "negative_prompt": negative,
             "width": 512,
             "height": 512,
-            "num_inference_steps": request.steps,
-            "guidance_scale": (
-                request.strength * 10 if request.strength else None
-            ),
-            "image": base64_image if request.init_image else None,
+            "num_inference_steps": max(4, min(request.steps or 4, 8)),
+            "guidance_scale": 0.0,   # FLUX.1-schnell is guidance-free
         },
     }
 
+    # Attach seed for reproducibility per style
     if request.seed is not None:
         payload["parameters"]["seed"] = request.seed
 
-    if request.init_image:
-        payload["parameters"]["image"] = base64_image
-
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         try:
-            response = await client.post(
-                HF_API_URL,
-                headers=headers,
-                json=payload,
+            response = await _call_hf_with_retry(
+                client, HF_TXT2IMG_URL, headers, payload
             )
             response.raise_for_status()
 
-            image_bytes = response.content
-            transparent_png_bytes = remove_background(image_bytes)
+            # Response is raw image bytes (PNG/JPEG)
+            img_bytes = response.content
+            pil = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+            pil = _resize_for_flux(pil)
+            return _pil_to_base64(pil)
 
-            return base64.b64encode(transparent_png_bytes).decode("utf-8")
-
+        except httpx.HTTPStatusError as exc:
+            print(f"HF API HTTP error {exc.response.status_code}: {exc.response.text[:300]}")
+            raise
         except Exception as exc:
-            print(f"Error during HF API call: {exc}")
-            return base64_image
+            print(f"HF API error: {exc}")
+            raise

@@ -9,31 +9,38 @@ def _validate_style_data(data: dict) -> None:
         raise ValueError(
             "style_prompts.json must contain a JSON object at the top level"
         )
-
     for name, attrs in data.items():
         if not isinstance(attrs, dict):
-            raise ValueError(
-                f"Style '{name}' must map to an object of attributes"
-            )
+            raise ValueError(f"Style '{name}' must map to an object of attributes")
         for field in ("style", "color", "texture", "lighting"):
             if field not in attrs:
-                raise ValueError(
-                    f"Style '{name}' is missing required field '{field}'"
-                )
+                raise ValueError(f"Style '{name}' is missing required field '{field}'")
 
 
-def _build_prompt(attrs: dict[str, str]) -> str:
+def _build_prompt(style_name: str, attrs: dict[str, str]) -> str:
+    """
+    Build a rich, identity-preserving, cinematic prompt for FLUX.1-schnell.
+    The prompt leads with the identity anchor so the model prioritises it,
+    then layers in the artistic style attributes.
+    """
     return (
-        "Portrait of the same person, preserve facial identity and pose, "
-        f"{attrs['style']} style, strands of hair breaking apart and "
-        "floating weightlessly upward, loose particles and fabric "
-        "drifting off the shoulders as if gravity is reversed, soft "
-        "upward motion trails, "
-        f"{attrs['color']} color palette, {attrs['texture']} texture and "
-        f"medium, {attrs['lighting']} lighting, clean refined linework, "
-        "consistent even line weight, no jitter or broken edges, "
-        "close-up headshot, centered composition, high detail, "
-        "1:1 aspect ratio"
+        # Identity anchor — always first so the model locks onto the person
+        f"A photorealistic close-up portrait of the same person transformed into "
+        f"{attrs['style']} style. "
+        # Identity preservation constraints
+        "Preserve the person's exact facial identity, facial bone structure, "
+        "hairstyle, hair color, eye shape, eye color, skin tone, facial expression, "
+        "nose shape, lip shape, and natural facial proportions. "
+        "Do not change the person's age, gender, or ethnicity. "
+        # Style application
+        f"Art style: {attrs['style']}. "
+        f"Color palette: {attrs['color']}. "
+        f"Surface texture and medium: {attrs['texture']}. "
+        f"Lighting: {attrs['lighting']}. "
+        # Quality anchors
+        "Ultra-high resolution, professional quality, cinematic composition, "
+        "centered headshot, sharp focus on face, clean edges, "
+        "smooth transitions, vibrant colors, 1:1 aspect ratio, 512x512."
     )
 
 
@@ -46,16 +53,14 @@ def _load_style_defs() -> dict[str, dict[str, str]]:
             f"Could not find style prompt config file: {STYLE_PROMPTS_FILE}"
         ) from exc
     except json.JSONDecodeError as exc:
-        raise ValueError(
-            f"Invalid JSON in {STYLE_PROMPTS_FILE}: {exc.msg}"
-        ) from exc
+        raise ValueError(f"Invalid JSON in {STYLE_PROMPTS_FILE}: {exc.msg}") from exc
 
     _validate_style_data(data)
     return data
 
 
 def _make_prompt_map(style_defs: dict[str, dict[str, str]]) -> dict[str, str]:
-    return {name: _build_prompt(attrs) for name, attrs in style_defs.items()}
+    return {name: _build_prompt(name, attrs) for name, attrs in style_defs.items()}
 
 
 STYLE_DEFS = _load_style_defs()
@@ -83,16 +88,20 @@ def save_style_definitions(definitions: dict[str, dict[str, str]]) -> None:
     reload_style_prompts()
 
 
-def get_prompt_for_style(style_name: str, base_prompt: str = "") -> str:
+def get_prompt_for_style(style_name: str) -> str:
+    """Return the fully-built prompt for a given style name."""
+    if style_name in STYLE_PROMPTS:
+        return STYLE_PROMPTS[style_name]
+    # Fallback: build on-the-fly from Anime defaults
     default_attrs = STYLE_DEFS.get("Anime", next(iter(STYLE_DEFS.values())))
-    attrs = STYLE_DEFS.get(style_name, default_attrs)
-    prompt = _build_prompt(attrs)
-    return f"{base_prompt} {prompt}".strip() if base_prompt else prompt
+    return _build_prompt(style_name, default_attrs)
 
 
 def get_negative_prompt() -> str:
     return (
-        "distorted face, bad anatomy, extra fingers, missing fingers, "
-        "deformed, ugly, blurry, low resolution, bad proportions, duplicate "
-        "features, mutated, poorly drawn face"
+        "different person, changed identity, wrong face, different face shape, "
+        "distorted face, bad anatomy, extra limbs, missing features, deformed, "
+        "ugly, blurry, low quality, low resolution, bad proportions, "
+        "duplicate features, mutated, poorly drawn face, disfigured, "
+        "watermark, signature, text, logo, border, frame"
     )

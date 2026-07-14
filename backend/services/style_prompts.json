@@ -1,114 +1,114 @@
 {
-  "Van Gogh": {
-    "style": "Van Gogh post-impressionist oil painting",
-    "color": "warm golden yellows and deep cobalt blues",
-    "texture": "swirling thick impasto brushstrokes, visible canvas",
-    "lighting": "dramatic directional",
-    "description": "A textured post-impressionist portrait inspired by Van Gogh."
-  },
   "Anime": {
-    "style": "Japanese anime cel-shaded",
-    "color": "bright saturated pastel palette",
-    "texture": "clean flat coloring with sharp highlight speculars",
-    "lighting": "large expressive eyes, soft cel-shading",
-    "description": "A clean anime portrait with sharp cel-shaded colors."
+    "style": "Japanese anime illustration, Studio Ghibli and Makoto Shinkai inspired",
+    "color": "vibrant saturated pastel palette, bright cel-shaded colors, colorful gradient sky background",
+    "texture": "clean flat cel shading, sharp specular highlights, smooth anime skin, large expressive eyes with detailed iris reflections",
+    "lighting": "soft anime rim lighting, warm fill light, expressive cel-shaded shadows",
+    "description": "Japanese anime illustration with expressive eyes, cel shading, and vibrant animation style."
+  },
+  "Van Gogh": {
+    "style": "Vincent van Gogh post-impressionist oil painting, Starry Night style",
+    "color": "warm golden yellows, deep cobalt blues, emerald greens, swirling complementary color contrasts",
+    "texture": "thick impasto brushstrokes, visible paint ridges, swirling turbulent patterns, textured canvas weave",
+    "lighting": "dramatic directional warm candlelight, deep expressive shadows",
+    "description": "Impressionist oil painting with thick textured brush strokes, swirling patterns, and rich blue and yellow colors."
   },
   "Neon": {
-    "style": "cyberpunk neon",
-    "color": "electric magenta and cyan on near-black background",
-    "texture": "glossy synthetic skin",
-    "lighting": "glowing rim light and light-trail highlights on facial contours",
-    "description": "A futuristic neon-lit cyberpunk face style."
+    "style": "futuristic neon holographic artwork, synthwave aesthetic",
+    "color": "electric magenta, cyan, and purple neon glows on near-black background, holographic iridescent reflections",
+    "texture": "glossy synthetic skin, glowing neon light trails, holographic foil texture, chromatic aberration edges",
+    "lighting": "intense neon rim lighting, glowing contour highlights, deep dark shadows with colored light spill",
+    "description": "Futuristic neon artwork with glowing blue, pink, and purple lights, holographic reflections, and cyber aesthetics."
   },
   "Pop Art": {
-    "style": "Andy Warhol pop art",
-    "color": "bold flat primary colors (red, yellow, cyan) with high contrast black outlines",
-    "texture": "halftone dot texture, screen-print look",
-    "lighting": "flat even",
-    "description": "A retro pop art portrait with bold colors and graphic textures."
+    "style": "Andy Warhol pop art screen print, Roy Lichtenstein comic style",
+    "color": "bold flat primary colors, red, yellow, cyan, magenta, high contrast black outlines, graphic color blocking",
+    "texture": "halftone dot pattern, screen-print registration marks, flat graphic areas, bold ink outlines",
+    "lighting": "flat even graphic lighting, no gradients, pure color fills",
+    "description": "Andy Warhol-inspired artwork with bold outlines, halftone dots, bright contrasting colors, and graphic comic design."
   },
   "Graffiti": {
-    "style": "urban graffiti street-art",
-    "color": "vibrant spray-paint palette (orange, purple, teal) with drip effects, bold black outline strokes",
-    "texture": "spray-can texture and stencil edges, brick wall undertone",
-    "lighting": "urban daylight",
-    "description": "A street-art graffiti style with vivid spray-paint textures."
+    "style": "urban street art graffiti mural, Banksy and wildstyle graffiti",
+    "color": "vibrant spray-paint palette, orange, purple, teal, lime green, drip effects, bold black outline strokes",
+    "texture": "spray-can aerosol texture, stencil cut edges, brick wall undertone, paint drips and splatter",
+    "lighting": "urban outdoor daylight, harsh shadows, street atmosphere",
+    "description": "Urban street art with spray paint textures, colorful murals, brick wall effects, and stencil painting."
   },
   "Watercolor": {
-    "style": "expressive watercolor painting",
-    "color": "soft pastel translucent colors",
-    "texture": "watercolor washes and drips on textured paper",
-    "lighting": "soft diffused lighting",
-    "description": "A soft watercolor portrait with flowing washes and texture."
+    "style": "expressive fine art watercolor painting on textured paper",
+    "color": "soft translucent pastel washes, wet-on-wet color blooms, delicate pigment gradients",
+    "texture": "watercolor paper grain, flowing pigment bleeds, soft brush edges, paint pooling and blooming",
+    "lighting": "soft diffused natural window light, gentle luminous shadows",
+    "description": "Soft watercolor painting with flowing pigments, artistic paper texture, and delicate brush blending."
   },
   "Pencil Sketch": {
-    "style": "monochromatic graphite sketch",
-    "color": "black and white graphite tones",
-    "texture": "fine cross-hatching and pencil strokes on paper",
-    "lighting": "dramatic high contrast lighting",
-    "description": "A realistic pencil sketch portrait with strong graphite shading."
+    "style": "realistic graphite pencil sketch on white drawing paper",
+    "color": "monochrome black and white graphite tones, subtle warm paper tint",
+    "texture": "fine cross-hatching, pencil stroke direction following facial contours, paper tooth texture, smudged shading",
+    "lighting": "dramatic high contrast chiaroscuro, deep shadows, bright highlights",
+    "description": "Realistic graphite sketch with detailed pencil shading, monochrome drawing, and textured paper."
   },
   "Cyberpunk": {
-    "style": "cyberpunk 2077 sci-fi",
-    "color": "neon city colors",
-    "texture": "high tech metallic and synthetic textures",
-    "lighting": "rainy neon city atmospheric lighting",
-    "description": "A cinematic cyberpunk style with glowing urban color accents."
-  },
-  "3D Cartoon": {
-    "style": "Pixar 3D animated movie",
-    "color": "bright cheerful stylized colors",
-    "texture": "smooth 3D render plasticine texture",
-    "lighting": "soft cinematic studio lighting",
-    "description": "A polished 3D cartoon-style portrait with smooth shading."
+    "style": "Cyberpunk 2077 sci-fi cinematic portrait, futuristic dystopian city",
+    "color": "neon city colors, electric blue, hot pink, acid yellow, dark rainy atmosphere",
+    "texture": "high-tech metallic implants, synthetic skin, holographic HUD overlays, rain-slicked surfaces",
+    "lighting": "rainy neon city atmospheric lighting, colored light spill from signs, volumetric fog",
+    "description": "Futuristic sci-fi portrait with neon lighting, holograms, advanced technology, and rainy city atmosphere."
   },
   "Oil Painting": {
-    "style": "classical Renaissance oil painting",
-    "color": "rich deep earthy colors",
-    "texture": "traditional canvas and oil paint strokes",
-    "lighting": "chiaroscuro dramatic lighting",
-    "description": "A classical oil painting portrait with rich tonal shading."
+    "style": "classical Renaissance oil painting, Rembrandt and Vermeer style",
+    "color": "rich deep earthy tones, warm ochres, burnt siennas, deep umbers, ivory highlights",
+    "texture": "traditional oil paint on canvas, visible brushwork, glazing layers, impasto highlights",
+    "lighting": "chiaroscuro dramatic lighting, single warm light source, deep velvety shadows",
+    "description": "Classical oil painting with realistic brushwork, rich canvas textures, dramatic lighting, and museum-quality artwork."
   },
   "Comic Book": {
-    "style": "Marvel comic book illustration",
-    "color": "bold primary colors with thick black outlines",
-    "texture": "halftone dot pattern, inked line art",
-    "lighting": "flat dramatic panel lighting",
-    "description": "A bold comic book portrait with inked outlines and halftone dots."
+    "style": "Marvel and DC comic book illustration, graphic novel art",
+    "color": "bold vibrant primary colors, dynamic color contrasts, flat color fills with cel shading",
+    "texture": "thick black ink outlines, halftone dot shading, dynamic action lines, inked crosshatching",
+    "lighting": "flat dramatic panel lighting, strong rim light, graphic shadow shapes",
+    "description": "Bold comic illustration with black ink outlines, dynamic shadows, graphic novel style, and vibrant comic colors."
   },
   "Fantasy": {
-    "style": "epic fantasy concept art",
-    "color": "rich jewel tones with magical glowing accents",
-    "texture": "detailed painterly digital art texture",
-    "lighting": "ethereal magical rim lighting",
-    "description": "A magical fantasy portrait with glowing ethereal lighting."
+    "style": "epic high fantasy concept art, magical portrait painting",
+    "color": "rich jewel tones, deep purples, emerald greens, gold accents, magical glowing particle effects",
+    "texture": "detailed painterly digital art, magical energy aura, glowing runes, ethereal particle effects",
+    "lighting": "ethereal magical rim lighting, mystical bioluminescent glow, cinematic epic atmosphere",
+    "description": "Magical fantasy artwork with glowing effects, enchanted environments, mystical lighting, and epic cinematic atmosphere."
   },
   "Clay Art": {
-    "style": "claymation stop-motion sculpted",
-    "color": "warm matte pastel clay tones",
-    "texture": "smooth clay surface with subtle fingerprint marks",
-    "lighting": "soft studio diffused lighting",
-    "description": "A charming claymation-style sculpted portrait."
+    "style": "handmade clay sculpture, Claymation stop-motion animation style",
+    "color": "warm matte pastel clay tones, terracotta, cream, soft blush, earthy pigments",
+    "texture": "smooth clay surface, subtle fingerprint and tool marks, rounded soft edges, matte clay material",
+    "lighting": "soft studio diffused lighting, gentle fill light, subtle clay surface sheen",
+    "description": "Handmade clay sculpture appearance with realistic clay texture, rounded shapes, and studio lighting."
   },
   "Pixel Art": {
-    "style": "retro 16-bit pixel art",
-    "color": "limited retro arcade color palette",
-    "texture": "sharp pixel grid, no anti-aliasing",
-    "lighting": "flat 2D sprite lighting",
-    "description": "A retro pixel art portrait in classic 16-bit arcade style."
+    "style": "retro 8-bit and 16-bit pixel art, arcade game sprite style",
+    "color": "limited retro arcade color palette, bright saturated pixel colors, dithering patterns",
+    "texture": "sharp square pixel grid, no anti-aliasing, visible pixel blocks, retro sprite shading",
+    "lighting": "flat 2D sprite lighting, simple highlight and shadow pixel blocks",
+    "description": "Retro 8-bit pixel artwork with colorful square pixels, arcade game aesthetics, and nostalgic digital style."
+  },
+  "3D Cartoon": {
+    "style": "Pixar and DreamWorks 3D animated movie character, high-quality CGI render",
+    "color": "bright cheerful stylized colors, smooth color gradients, subsurface skin scattering",
+    "texture": "smooth 3D render, subsurface scattering skin, glossy eyes, soft cloth simulation",
+    "lighting": "soft cinematic three-point studio lighting, ambient occlusion, movie-quality rendering",
+    "description": "High-quality animated 3D character with smooth textures, expressive features, soft lighting, and movie-quality rendering."
   },
   "Digital Painting": {
-    "style": "ArtStation masterpiece digital painting",
-    "color": "vibrant rich color palette with deep shadows",
-    "texture": "smooth digital brush strokes, high detail",
-    "lighting": "cinematic three-point lighting",
-    "description": "A high-detail digital painting portrait in ArtStation style."
+    "style": "professional digital concept art, ArtStation and CGSociety masterpiece quality",
+    "color": "vibrant rich color palette, deep dramatic shadows, luminous highlights, cinematic color grading",
+    "texture": "smooth digital brush strokes, ultra-detailed skin pores, realistic hair strands, fabric weave",
+    "lighting": "cinematic three-point lighting, dramatic key light, colored rim light, professional studio setup",
+    "description": "Professional digital artwork with cinematic lighting, realistic brushwork, ultra-detailed textures, and concept art quality."
   },
   "Low Poly Art": {
-    "style": "modern low poly geometric art",
-    "color": "clean flat geometric color fills",
-    "texture": "triangulated polygon mesh surface",
-    "lighting": "flat minimalist lighting",
-    "description": "A minimalist low poly geometric portrait."
+    "style": "modern low poly geometric art, triangulated polygon mesh portrait",
+    "color": "clean flat geometric color fills, vibrant gradient polygon faces, bold color contrasts",
+    "texture": "triangulated polygon mesh surface, flat shaded facets, sharp angular edges, geometric abstraction",
+    "lighting": "flat minimalist directional lighting, clean polygon shadow facets",
+    "description": "Modern geometric artwork created from colorful polygon shapes with clean angular surfaces and vibrant gradients."
   }
 }
