@@ -85,7 +85,8 @@ def save_style_definitions(definitions: dict[str, dict[str, str]]) -> None:
 def get_prompt_for_style(style_name: str, base_prompt: str = "") -> str:
     default_attrs = STYLE_DEFS.get("Anime", next(iter(STYLE_DEFS.values())))
     attrs = STYLE_DEFS.get(style_name, default_attrs)
-    return _build_prompt(attrs)
+    prompt = _build_prompt(attrs)
+    return f"{base_prompt} {prompt}".strip() if base_prompt else prompt
 
 
 def get_negative_prompt() -> str:

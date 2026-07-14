@@ -7,8 +7,8 @@ from rembg import remove
 from services.style_prompts import get_prompt_for_style, get_negative_prompt
 from schemas.generation import GenerateRequest
 
-# For FLUX.1-schnell via Hugging Face Inference API
-HF_API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell"
+# For FLUX.2 via Hugging Face Inference API
+HF_API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.2-klein-4B"
 
 def remove_background(image_bytes: bytes) -> bytes:
     """Removes background from image bytes using rembg and returns PNG bytes."""
@@ -53,7 +53,8 @@ async def generate_styled_image(base64_image: str, request: GenerateRequest) -> 
             "width": 512,
             "height": 512,
             "num_inference_steps": request.steps,
-            "guidance_scale": request.strength * 10 if request.strength else None
+            "guidance_scale": request.strength * 10 if request.strength else None,
+            "image": base64_image if request.init_image else None
         }
     }
     

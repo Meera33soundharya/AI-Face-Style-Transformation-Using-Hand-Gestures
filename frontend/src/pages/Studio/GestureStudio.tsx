@@ -19,6 +19,7 @@ export const GestureStudio = () => {
 
   const [phase, setPhase] = useState<Phase>('INIT');
   const [activeStyleIndex, setActiveStyleIndex] = useState(0);
+  const [blinkCount, setBlinkCount] = useState(0);
   const [hologramSrc, setHologramSrc] = useState<string | null>(null);
   const [hologramPos, setHologramPos] = useState<{ x: number; y: number; w: number; h: number; rot: number } | null>(null);
 
@@ -154,6 +155,7 @@ export const GestureStudio = () => {
   useEffect(() => {
     if (!isBlinking || !hasBothHands || phase === 'INIT' || phase === 'NO_FACE') return;
 
+    setBlinkCount((prev) => prev + 1);
     const nextIndex = (activeStyleIndexRef.current + 1) % ART_STYLES.length;
     setActiveStyleIndex(nextIndex);
     setPhase('READY');
@@ -209,7 +211,7 @@ export const GestureStudio = () => {
       case 'INIT': return { text: 'Initializing AI...', color: 'text-gray-400', spin: true };
       case 'NO_FACE': return { text: 'Looking for face...', color: 'text-blue-400', spin: true };
       case 'FACE_ONLY': return { text: '🤙 Raise hands to frame your face', color: 'text-blue-400', spin: false };
-      case 'READY': return { text: `✨ Applying ${style.emoji} ${style.name}...`, color: 'text-green-400', spin: true };
+      case 'READY': return { text: `✨ ${hasBothHands ? 'Ready' : 'Waiting for hands'} — Blink now to switch style`, color: 'text-green-400', spin: false };
       case 'GENERATING': return { text: `⚡ FLUX Generating ${style.name}...`, color: 'text-yellow-400', spin: true };
       case 'SHOWING': return { text: `✨ ${style.emoji} ${style.name} — Pick a style below`, color: 'text-purple-300', spin: false };
     }
@@ -219,139 +221,149 @@ export const GestureStudio = () => {
   const activeStyle = ART_STYLES[activeStyleIndex];
 
   return (
-    <div className="min-h-screen bg-black overflow-hidden relative select-none flex items-center justify-center p-8 pb-32 pt-24">
-      {/* Top navigation bar */}
-      <header className="absolute top-0 left-0 right-0 z-40 px-5 py-4 flex items-center justify-between"
-        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)' }}>
-        <button onClick={() => { logout(); navigate('/login'); }}
-          className="flex items-center gap-2 text-sm text-gray-300 hover:text-white transition bg-white/10 backdrop-blur px-3 py-2 rounded-xl border border-white/10">
-          <LogOut className="w-4 h-4" /> Sign Out
-        </button>
-
-        <div className={`flex flex-col items-start gap-1 bg-black/60 backdrop-blur px-4 py-2 rounded-full border border-white/15 ${status.color}`}>
-          <div className="flex items-center gap-2">
-            {status.spin && <Loader2 className="w-4 h-4 animate-spin" />}
-            {!status.spin && phase === 'READY' && <Sparkles className="w-4 h-4" />}
-            <span className="text-sm font-semibold">{status.text}</span>
+    <div className="min-h-screen bg-slate-950 overflow-hidden relative text-white">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <nav className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between py-4">
+          <div>
+            <div className="text-2xl font-bold tracking-tight">VisionAI</div>
+            <div className="text-sm text-slate-400 mt-1">Gesture-powered art generation with MediaPipe + FLUX.2</div>
           </div>
-          {isBlinking && (
-            <span className="text-[11px] text-white/60">
-              Blink detected — cycling to the next style
-            </span>
-          )}
-        </div>
-
-        <div className="text-right">
-          <div className="text-xs text-gray-500 uppercase tracking-widest">Style</div>
-          <div className="text-sm font-bold" style={{ color: activeStyle.color }}>
-            {activeStyle.emoji} {activeStyle.name}
-          </div>
-        </div>
-      </header>
-
-      {/* Boxed Camera Container */}
-      <div ref={containerRef} className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden border border-white/15 shadow-2xl bg-gray-900">
-        {/* Camera feed */}
-        <video ref={videoRef} autoPlay playsInline muted
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ transform: 'scaleX(-1)' }}
-        />
-
-        <EyeTracker isBlinking={isBlinking} showDebug />
-
-        {/* Frame guide with corner brackets */}
-        {getFrameGuide()}
-
-        {/* Gesture Indicator */}
-        <GestureIndicator gesture={currentGesture} />
-
-        {/* Hologram panel */}
-        {hologramPos && (phase === 'SHOWING' || phase === 'GENERATING') && (
-          <div className="absolute z-30 pointer-events-none transition-all duration-300"
-            style={{ 
-              left: hologramPos.x, top: hologramPos.y, 
-              width: hologramPos.w, height: hologramPos.h,
-              transform: `rotate(${hologramPos.rot}deg)`
-            }}>
-            <div className="absolute inset-0 overflow-hidden bg-black/60 card-pulse"
-              style={{
-                border: '22px solid white',
-                boxShadow: `6px 10px 15px rgba(0,0,0,0.4), 0 0 40px ${activeStyle.color}60`,
-              }}>
-              {/* Generating state */}
-              {phase === 'GENERATING' && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                  <Loader2 className="w-12 h-12 text-white animate-spin" />
-                  <p className="text-white text-sm font-bold tracking-widest uppercase"
-                    style={{ textShadow: `0 0 12px ${activeStyle.color}` }}>
-                    AI Rendering...
-                  </p>
-                </div>
-              )}
-
-              {/* Generated image */}
-              {phase === 'SHOWING' && hologramSrc && (
-                <img src={hologramSrc} alt="AI Generated"
-                  className="w-full h-full object-cover" />
-              )}
-
-              {/* Scanline overlay */}
-              <div className="absolute inset-0 scanlines pointer-events-none" />
-              {/* Top sheen */}
-              <div className="absolute top-0 left-0 right-0 h-16 pointer-events-none" style={{
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0.12), transparent)',
-              }} />
-              {/* Style badge */}
-              <div className="absolute bottom-2 right-3 text-xs font-bold opacity-80"
-                style={{ color: activeStyle.color, textShadow: `0 0 10px ${activeStyle.color}` }}>
-                {activeStyle.emoji} {activeStyle.name}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Instruction overlay */}
-        {phase === 'FACE_ONLY' && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-            <div className="text-center bg-black/50 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-              <div className="text-6xl mb-4">🤙</div>
-              <p className="text-white text-xl font-bold">Frame your face with both hands</p>
-              <p className="text-gray-400 text-sm mt-2">Make L-shapes — index finger up, thumb pointing out</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Bottom art style carousel */}
-      <div className="absolute bottom-0 left-0 right-0 z-40 px-4 pb-5"
-        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.95) 60%, transparent)' }}>
-        <div className="text-center text-xs text-gray-500 uppercase tracking-widest mb-3">
-          Select Art Style
-        </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide justify-center">
-          {ART_STYLES.map((style, idx) => (
-            <button key={style.id}
-              onClick={() => {
-                setActiveStyleIndex(idx);
-                if (phase === 'SHOWING') setPhase('READY');
-              }}
-              className={`flex-shrink-0 flex flex-col items-center gap-1.5 transition-all duration-300 ${idx === activeStyleIndex ? 'style-btn-active' : ''}`}>
-              <div className="w-13 h-13 rounded-xl flex items-center justify-center text-2xl border-2 transition-all duration-300"
-                style={{
-                  width: 52, height: 52,
-                  background: `linear-gradient(135deg, ${style.color}35, ${style.color}15)`,
-                  borderColor: idx === activeStyleIndex ? style.color : 'rgba(255,255,255,0.12)',
-                  boxShadow: idx === activeStyleIndex ? `0 0 20px ${style.color}90` : 'none',
-                  transform: idx === activeStyleIndex ? 'scale(1.22)' : 'scale(1)',
-                }}>
-                {style.emoji}
-              </div>
-              <span className="text-xs whitespace-nowrap"
-                style={{ color: idx === activeStyleIndex ? style.color : 'rgba(255,255,255,0.4)' }}>
-                {style.name}
-              </span>
+          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+            <button className="hover:text-white transition">Home</button>
+            <button className="hover:text-white transition">Demo</button>
+            <button className="hover:text-white transition">Features</button>
+            <button className="hover:text-white transition">About</button>
+            <button className="hover:text-white transition">Contact</button>
+            <button className="rounded-full bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/20">
+              Launch AI
             </button>
-          ))}
+          </div>
+        </nav>
+
+        <div className="grid gap-10 xl:grid-cols-[0.95fr_0.9fr] items-start py-8">
+          <div className="space-y-8">
+            <div className="max-w-2xl space-y-6">
+              <div className="text-sm uppercase tracking-[0.35em] text-pink-300">VisionAI</div>
+              <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white">
+                Transform Your Face Into<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-400">16 Amazing AI Art Styles</span>
+              </h1>
+              <p className="text-lg text-slate-300 max-w-xl">
+                Experience gesture-controlled AI image generation using MediaPipe and FLUX.2.
+                Blink to switch style, use gestures to interact, and watch your portrait transform live.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <button
+                  onClick={startWebcam}
+                  className="rounded-full bg-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 hover:bg-violet-400 transition"
+                >
+                  Start Camera
+                </button>
+                <button className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 transition">
+                  View Demo
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-3xl border border-white/10 bg-slate-900/85 p-6 shadow-2xl shadow-black/20">
+                <div className="text-xs uppercase tracking-[0.25em] text-slate-400 mb-3">Gesture Detected</div>
+                <div className="text-3xl font-bold text-white">{currentGesture === 'none' ? 'Waiting...' : currentGesture.replace('_', ' ')}</div>
+                <p className="mt-3 text-sm text-slate-400">Raise both hands to frame your face. Blink to change your art style instantly.</p>
+              </div>
+              <div className="rounded-3xl border border-white/10 bg-slate-900/85 p-6 shadow-2xl shadow-black/20">
+                <div className="text-xs uppercase tracking-[0.25em] text-slate-400 mb-3">Current Style</div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-violet-500 to-pink-500 text-2xl shadow-lg shadow-violet-500/20">
+                    {activeStyle.emoji}
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{activeStyle.name}</div>
+                    <div className="text-sm text-slate-400">{activeStyle.description}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="rounded-3xl border border-white/10 bg-slate-900/85 shadow-2xl shadow-black/20 overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-950/80">
+                <div>
+                  <div className="text-xs uppercase tracking-[0.28em] text-slate-400">Live Camera Preview</div>
+                  <div className="text-sm text-slate-300">AI Illustration</div>
+                </div>
+                <button
+                  onClick={startWebcam}
+                  className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white hover:bg-white/15 transition"
+                >
+                  Start Camera
+                </button>
+              </div>
+              <div className="relative aspect-[16/9] bg-black">
+                <video ref={videoRef} autoPlay playsInline muted
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ transform: 'scaleX(-1)' }}
+                />
+                <EyeTracker isBlinking={isBlinking} showDebug />
+                {getFrameGuide()}
+                <GestureIndicator gesture={currentGesture} />
+                <div className="absolute bottom-4 left-4 rounded-2xl bg-black/70 px-4 py-2 text-xs text-slate-200">
+                  {status.text}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="rounded-3xl border border-white/10 bg-slate-900/85 p-5 shadow-2xl shadow-black/20">
+                <div className="text-xs uppercase tracking-[0.25em] text-slate-400 mb-3">Status</div>
+                <div className="text-sm text-slate-200 mb-3">{phase === 'INIT' ? 'Initializing models...' : phase === 'NO_FACE' ? 'Looking for face...' : phase === 'FACE_ONLY' ? 'Frame your face with your hands' : phase === 'READY' ? 'Ready to generate' : phase === 'GENERATING' ? 'Generating art...' : 'Showing result'}</div>
+                <div className="text-xs text-slate-400 space-y-1">
+                  <div>Face detected: {hasFace ? 'Yes' : 'No'}</div>
+                  <div>Hands detected: {hasBothHands ? 'Yes' : 'No'}</div>
+                  <div>Style switches by blink: <span className="font-semibold text-white">{blinkCount}</span></div>
+                </div>
+              </div>
+              <div className="rounded-3xl border border-white/10 bg-slate-900/85 p-5 shadow-2xl shadow-black/20">
+                <div className="text-xs uppercase tracking-[0.25em] text-slate-400 mb-3">Instructions</div>
+                <ul className="space-y-3 text-sm text-slate-300">
+                  <li>• Blink to change the art style</li>
+                  <li>• Use both hands to frame and enable generation</li>
+                  <li>• Point up to generate on demand</li>
+                  <li>• Pinch to download the latest image</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-slate-900/85 p-6 shadow-2xl shadow-black/20">
+          <div className="text-center text-xs uppercase tracking-[0.28em] text-slate-400 mb-4">Select Art Style</div>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide justify-center">
+            {ART_STYLES.map((style, idx) => (
+              <button key={style.id}
+                onClick={() => {
+                  setActiveStyleIndex(idx);
+                  if (phase === 'SHOWING') setPhase('READY');
+                }}
+                className={`flex-shrink-0 flex flex-col items-center gap-1.5 transition-all duration-300 ${idx === activeStyleIndex ? 'style-btn-active' : ''}`}>
+                <div className="w-13 h-13 rounded-xl flex items-center justify-center text-2xl border-2 transition-all duration-300"
+                  style={{
+                    width: 52, height: 52,
+                    background: `linear-gradient(135deg, ${style.color}35, ${style.color}15)`,
+                    borderColor: idx === activeStyleIndex ? style.color : 'rgba(255,255,255,0.12)',
+                    boxShadow: idx === activeStyleIndex ? `0 0 20px ${style.color}90` : 'none',
+                    transform: idx === activeStyleIndex ? 'scale(1.22)' : 'scale(1)',
+                  }}>
+                  {style.emoji}
+                </div>
+                <span className="text-xs whitespace-nowrap"
+                  style={{ color: idx === activeStyleIndex ? style.color : 'rgba(255,255,255,0.4)' }}>
+                  {style.name}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
