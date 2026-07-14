@@ -25,14 +25,15 @@ def _validate_style_data(data: dict) -> None:
 def _build_prompt(attrs: dict[str, str]) -> str:
     return (
         "Portrait of the same person, preserve facial identity and pose, "
-        f"{attrs['style']} style, strands of hair breaking apart and floating "
-        "weightlessly upward, loose particles and fabric drifting off the "
-        "shoulders as if gravity is reversed, soft upward motion trails, "
-        f"{attrs['color']} color palette, {attrs['texture']} texture and medium, "
-        f"{attrs['lighting']} lighting, clean refined linework, "
+        f"{attrs['style']} style, strands of hair breaking apart and "
+        "floating weightlessly upward, loose particles and fabric "
+        "drifting off the shoulders as if gravity is reversed, soft "
+        "upward motion trails, "
+        f"{attrs['color']} color palette, {attrs['texture']} texture and "
+        f"medium, {attrs['lighting']} lighting, clean refined linework, "
         "consistent even line weight, no jitter or broken edges, "
-        "close-up headshot, centered composition, "
-        "high detail, 1:1 aspect ratio"
+        "close-up headshot, centered composition, high detail, "
+        "1:1 aspect ratio"
     )
 
 

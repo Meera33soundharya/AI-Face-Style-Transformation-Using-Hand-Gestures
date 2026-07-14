@@ -1,18 +1,24 @@
 import time
+from typing import cast
+
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from core.config import get_db
+
 from api.auth import get_current_user
-from models.user import User
+from core.config import get_db
 from models.generation import Generation
-from schemas.generation import GenerateRequest, GenerateResponse, StyleInfo
+from models.user import User
+from schemas.generation import (
+    GenerateRequest,
+    GenerateResponse,
+    StyleInfo,
+)
 from services import style_prompts
-from services.face_processor import process_face_image
 from services.ai_generator import generate_styled_image
+from services.face_processor import process_face_image
 from services.video_service import generate_cinematic_video
 from services.vfx_pipeline import apply_vfx
-from pydantic import BaseModel
-
 
 router = APIRouter(prefix="/api/generate", tags=["generate"])
 
@@ -31,7 +37,6 @@ def get_styles():
     return styles
 
 
-
 @router.post("/", response_model=GenerateResponse)
 async def generate_image(
     request: GenerateRequest,
@@ -48,26 +53,21 @@ async def generate_image(
     start_time = time.time()
 
     try:
-        # 1. Process and validate the input face image (or init_image if chaining)
-        input_b64 = (
-            request.init_image if request.init_image else request.image
-        )
+        input_b64 = request.init_image if request.init_image else request.image
         processed_base64 = process_face_image(input_b64)
 
-        # 2. Call the AI Model via HF Inference API
         generated_base64 = await generate_styled_image(
             processed_base64,
             request,
         )
 
-        # 3. Apply post-processing VFX
-        final_base64 = apply_vfx(generated_base64, current_user.id)
+        # Pass a plain int (help static type checkers)
+        final_base64 = apply_vfx(generated_base64, cast(int, current_user.id))
 
         processing_time = round(time.time() - start_time, 2)
 
-        # 4. Log the generation in the database
         db_generation = Generation(
-            user_id=current_user.id,
+            user_id=cast(int, current_user.id),
             style=request.style,
             processing_time=processing_time,
         )
@@ -75,21 +75,19 @@ async def generate_image(
         db.commit()
 
         return GenerateResponse(
-            generated_image=(
-                f"data:image/png;base64,{final_base64}"
-            ),
+            generated_image=f"data:image/png;base64,{final_base64}",
             style=request.style,
             processing_time=processing_time,
         )
 
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        print(f"Generation error: {e}")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        print(f"Generation error: {exc}")
         raise HTTPException(
             status_code=500,
             detail="Failed to generate image",
-        )
+        ) from exc
 
 
 class VideoRequest(BaseModel):
@@ -104,21 +102,17 @@ async def generate_video(
 ):
     """Generate a cinematic video from the provided face image."""
     try:
-        # Process and validate the input face image
         processed_base64 = process_face_image(request.image)
-        data_uri = (
-            f"data:image/jpeg;base64,{processed_base64}"
-        )
+        data_uri = f"data:image/jpeg;base64,{processed_base64}"
 
-        # Call Replicate API to generate video
         video_url = await generate_cinematic_video(data_uri)
 
         return {"video_url": video_url}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        print(f"Video generation error: {e}")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        print(f"Video generation error: {exc}")
         raise HTTPException(
             status_code=500,
             detail="Failed to generate video",
-        )
+        ) from exc

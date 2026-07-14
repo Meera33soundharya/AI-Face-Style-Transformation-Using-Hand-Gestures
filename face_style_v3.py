@@ -61,24 +61,29 @@ load_dotenv()
 HF_API_TOKEN = os.environ.get("HF_API_TOKEN", "")
 MODEL_ID = "black-forest-labs/FLUX.2-klein-4B"
 
-ART_SIZE = 512                 # <- change this one value to resize all generated art (e.g. 512, 768, 1024)
+ART_SIZE = 512
+"""Resize generated art. Example values: 512, 768, 1024."""
 IMG2IMG_STRENGTH = 0.45
-BLINK_EAR_THRESHOLD = 0.21     # lower = eye more closed
-BLINK_CONSEC_FRAMES = 2        # frames below threshold to confirm a real blink (not noise)
-TRIGGER_COOLDOWN_SEC = 1.2     # minimum gap between triggers so one blink = one change
+BLINK_EAR_THRESHOLD = 0.21
+# Consecutive frames below threshold to confirm a blink
+BLINK_CONSEC_FRAMES = 2
+# Minimum gap between triggers (seconds)
+TRIGGER_COOLDOWN_SEC = 1.2
 
-STYLE_CONFIG_FILE = Path(__file__).resolve().parent / "backend" / "services" / "style_prompts.json"
+BASE_DIR = Path(__file__).resolve().parent
+STYLE_CONFIG_FILE = BASE_DIR / "backend" / "services" / "style_prompts.json"
 
-PROMPT_TEMPLATE = (
-    "Portrait of the same person, preserve facial identity and pose, {style} style,\n"
-    "strands of hair breaking apart and floating weightlessly upward,\n"
-    "loose particles and fabric drifting off the shoulders as if gravity is reversed,\n"
-    "soft upward motion trails, {color} color palette, {texture} texture and medium,\n"
-    "{lighting} lighting, match the original photo's natural hair color and skin tone exactly, do not alter "
-    "hair or skin color from the source image,\n"
-    "clean refined linework, consistent even line weight, no jitter or broken edges,\n"
-    f"close-up headshot, centered composition, high detail, square {ART_SIZE}x{ART_SIZE} output"
-)
+PROMPT_TEMPLATE = "".join([
+    "Portrait preserving facial identity and pose, {style} style,\n",
+    "strands of hair breaking apart and floating upward,\n",
+    "loose particles and fabric drifting off the shoulders,\n",
+    "soft upward motion trails, {color} palette, {texture} texture,\n",
+    "{lighting} lighting. Match the original photo's hair and skin tone; ",
+    "do not alter hair or skin color from the source image,\n",
+    "clean refined linework, consistent weight, no jitter or broken edges,\n",
+    "close-up headshot, centered composition, high detail, ",
+    f"square {ART_SIZE}x{ART_SIZE} output",
+])
 
 STYLE_SEEDS = {"vangogh": 4821, "neon": 9013, "anime": 2277}
 
@@ -93,15 +98,17 @@ def _load_style_prompts() -> dict[str, str]:
         raise RuntimeError(f"Invalid JSON in {STYLE_CONFIG_FILE}: {exc.msg}")
 
     if not isinstance(data, dict):
-        raise RuntimeError("Style config file must contain an object mapping style names to attributes.")
+        raise RuntimeError("Style config must map style names to attributes.")
 
     prompts = {}
     for name, attrs in data.items():
         if not isinstance(attrs, dict):
-            raise RuntimeError(f"Style '{name}' must be an object with style attributes.")
+            raise RuntimeError(f"Style '{name}' must be an attributes object.")
         for field in ("style", "color", "texture", "lighting"):
             if field not in attrs:
-                raise RuntimeError(f"Style '{name}' missing required field '{field}'.")
+                raise RuntimeError(
+                    f"Style '{name}' missing required field '{field}'."
+                )
         prompts[name] = PROMPT_TEMPLATE.format(**attrs)
     return prompts
 
@@ -115,13 +122,25 @@ STYLE_CYCLE = list(STYLE_PROMPTS.keys())
 
 mp_hands = mp.solutions.hands
 mp_face = mp.solutions.face_mesh
-hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.6, min_tracking_confidence=0.6)
-face_mesh = mp_face.FaceMesh(max_num_faces=1, refine_landmarks=True,
-                              min_detection_confidence=0.6, min_tracking_confidence=0.6)
+hands = mp_hands.Hands(
+    max_num_hands=2,
+    min_detection_confidence=0.6,
+    min_tracking_confidence=0.6,
+)
+face_mesh = mp_face.FaceMesh(
+    max_num_faces=1,
+    refine_landmarks=True,
+    min_detection_confidence=0.6,
+    min_tracking_confidence=0.6,
+)
 
-FACE_OVAL = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365,
-             379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93,
-             234, 127, 162, 21, 54, 103, 67, 109]
+FACE_OVAL = [
+    10, 338, 297, 332, 284, 251, 389, 356,
+    454, 323, 361, 288, 397, 365, 379, 378,
+    400, 377, 152, 148, 176, 149, 150, 136,
+    172, 58, 132, 93, 234, 127, 162, 21,
+    54, 103, 67, 109,
+]
 
 LEFT_EYE_EAR = [33, 160, 158, 133, 153, 144]
 RIGHT_EYE_EAR = [362, 385, 387, 263, 373, 380]
@@ -164,7 +183,9 @@ class BlinkDetector:
 def detect_pinch(hand_landmarks):
     thumb_tip = hand_landmarks.landmark[4]
     index_tip = hand_landmarks.landmark[8]
-    dist = ((thumb_tip.x - index_tip.x) ** 2 + (thumb_tip.y - index_tip.y) ** 2) ** 0.5
+    dx = thumb_tip.x - index_tip.x
+    dy = thumb_tip.y - index_tip.y
+    dist = (dx * dx + dy * dy) ** 0.5
     return dist < 0.045
 
 
@@ -190,7 +211,10 @@ def get_face_crop(frame, landmarks):
     to zero width/height (face partially off-frame) -- caller must check
     crop.size before using it."""
     h, w = frame.shape[:2]
-    pts = np.array([(int(landmarks[i].x * w), int(landmarks[i].y * h)) for i in FACE_OVAL])
+    pts = np.array([
+        (int(landmarks[i].x * w), int(landmarks[i].y * h))
+        for i in FACE_OVAL
+    ])
     x, y, bw, bh = cv2.boundingRect(pts)
     pad = int(0.15 * bw)
     x, y = max(0, x - pad), max(0, y - pad)
@@ -202,7 +226,7 @@ def get_face_crop(frame, landmarks):
 
 
 # ---------------------------------------------------------------------------
-# COLOR FIX: Reinhard LAB color transfer, locks hair/skin tone to the real photo
+# COLOR FIX: Reinhard LAB color transfer — locks hair/skin tone to real photo
 # ---------------------------------------------------------------------------
 
 def color_transfer(source_bgr, target_bgr):
@@ -211,8 +235,10 @@ def color_transfer(source_bgr, target_bgr):
     src_lab = cv2.cvtColor(source_bgr, cv2.COLOR_BGR2LAB).astype(np.float32)
     tgt_lab = cv2.cvtColor(target_bgr, cv2.COLOR_BGR2LAB).astype(np.float32)
 
-    src_mean, src_std = src_lab.mean(axis=(0, 1)), src_lab.std(axis=(0, 1)) + 1e-6
-    tgt_mean, tgt_std = tgt_lab.mean(axis=(0, 1)), tgt_lab.std(axis=(0, 1)) + 1e-6
+    src_mean = src_lab.mean(axis=(0, 1))
+    src_std = src_lab.std(axis=(0, 1)) + 1e-6
+    tgt_mean = tgt_lab.mean(axis=(0, 1))
+    tgt_std = tgt_lab.std(axis=(0, 1)) + 1e-6
 
     result = (tgt_lab - tgt_mean) * (src_std / tgt_std) + src_mean
     result = np.clip(result, 0, 255).astype(np.uint8)
@@ -231,7 +257,7 @@ _hf_client = None
 def get_hf_client():
     global _hf_client
     if not HF_API_TOKEN:
-        raise RuntimeError("HF_API_TOKEN not set. Run: export HF_API_TOKEN='your_token'")
+        raise RuntimeError("HF_API_TOKEN not set.")
     if _hf_client is None:
         _hf_client = InferenceClient(provider="auto", api_key=HF_API_TOKEN)
     return _hf_client
@@ -239,7 +265,7 @@ def get_hf_client():
 
 def generate_style(face_crop_bgr, style):
     if face_crop_bgr.size == 0:
-        raise RuntimeError("Empty face crop (face partially off-frame), skipping generation.")
+        raise RuntimeError("Empty face crop; skipping generation.")
 
     client = get_hf_client()
 
@@ -259,9 +285,10 @@ def generate_style(face_crop_bgr, style):
     )
 
     if pil_result is None:
-        raise RuntimeError(f"HF Inference API returned no image for style '{style}'.")
+        raise RuntimeError("HF Inference API returned no image.")
 
-    result_bgr = cv2.cvtColor(np.array(pil_result.convert("RGB")), cv2.COLOR_RGB2BGR)
+    pil_rgb = pil_result.convert("RGB")
+    result_bgr = cv2.cvtColor(np.array(pil_rgb), cv2.COLOR_RGB2BGR)
 
     # lock hair/skin color to the real photo
     return color_transfer(resized, result_bgr)
@@ -274,7 +301,7 @@ def generate_style(face_crop_bgr, style):
 def main():
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
-        raise RuntimeError("Could not open webcam (index 0). Check camera permissions/connection.")
+        raise RuntimeError("Could not open webcam (index 0).")
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     blink_detector = BlinkDetector()
@@ -309,7 +336,7 @@ def main():
                     fire_trigger = True
                     status_msg = "Pinch detected -> next style"
 
-                # single crop/bbox computation per frame (was called twice in v2)
+                # single crop/bbox per frame
                 crop, bbox = get_face_crop(frame, landmarks)
                 x, y, bw, bh = bbox
 
@@ -326,8 +353,16 @@ def main():
                     placed = cv2.resize(last_result, (bw, bh))
                     display[y:y + bh, x:x + bw] = placed
 
-            cv2.putText(display, status_msg, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.7, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(
+                display,
+                status_msg,
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.7,
+                (0, 255, 0),
+                2,
+                cv2.LINE_AA,
+            )
             cv2.imshow("Face Style (blink or pinch to change)", display)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
