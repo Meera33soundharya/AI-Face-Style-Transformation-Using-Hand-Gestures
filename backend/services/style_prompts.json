@@ -68,5 +68,47 @@
     "texture": "traditional canvas and oil paint strokes",
     "lighting": "chiaroscuro dramatic lighting",
     "description": "A classical oil painting portrait with rich tonal shading."
+  },
+  "Comic Book": {
+    "style": "Marvel comic book illustration",
+    "color": "bold primary colors with thick black outlines",
+    "texture": "halftone dot pattern, inked line art",
+    "lighting": "flat dramatic panel lighting",
+    "description": "A bold comic book portrait with inked outlines and halftone dots."
+  },
+  "Fantasy": {
+    "style": "epic fantasy concept art",
+    "color": "rich jewel tones with magical glowing accents",
+    "texture": "detailed painterly digital art texture",
+    "lighting": "ethereal magical rim lighting",
+    "description": "A magical fantasy portrait with glowing ethereal lighting."
+  },
+  "Clay Art": {
+    "style": "claymation stop-motion sculpted",
+    "color": "warm matte pastel clay tones",
+    "texture": "smooth clay surface with subtle fingerprint marks",
+    "lighting": "soft studio diffused lighting",
+    "description": "A charming claymation-style sculpted portrait."
+  },
+  "Pixel Art": {
+    "style": "retro 16-bit pixel art",
+    "color": "limited retro arcade color palette",
+    "texture": "sharp pixel grid, no anti-aliasing",
+    "lighting": "flat 2D sprite lighting",
+    "description": "A retro pixel art portrait in classic 16-bit arcade style."
+  },
+  "Digital Painting": {
+    "style": "ArtStation masterpiece digital painting",
+    "color": "vibrant rich color palette with deep shadows",
+    "texture": "smooth digital brush strokes, high detail",
+    "lighting": "cinematic three-point lighting",
+    "description": "A high-detail digital painting portrait in ArtStation style."
+  },
+  "Low Poly Art": {
+    "style": "modern low poly geometric art",
+    "color": "clean flat geometric color fills",
+    "texture": "triangulated polygon mesh surface",
+    "lighting": "flat minimalist lighting",
+    "description": "A minimalist low poly geometric portrait."
   }
 }
