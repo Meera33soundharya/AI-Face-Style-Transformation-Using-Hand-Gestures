@@ -6,9 +6,9 @@ from api.auth import get_current_user
 from models.user import User
 from models.generation import Generation
 from schemas.generation import GenerateRequest, GenerateResponse, StyleInfo
+from services import style_prompts
 from services.face_processor import process_face_image
 from services.ai_generator import generate_styled_image
-from services.style_prompts import STYLE_PROMPTS
 from services.video_service import generate_cinematic_video
 from services.vfx_pipeline import apply_vfx
 from pydantic import BaseModel
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/api/generate", tags=["generate"])
 def get_styles():
     """Return available styles."""
     styles = []
-    for name in STYLE_PROMPTS.keys():
+    for name in style_prompts.STYLE_PROMPTS.keys():
         styles.append(StyleInfo(id=name.lower().replace(" ", "_"), name=name))
     return styles
 
@@ -30,7 +30,7 @@ async def generate_image(
     db: Session = Depends(get_db)
 ):
     """Generate a stylized image from the provided face image."""
-    if request.style not in STYLE_PROMPTS:
+    if request.style not in style_prompts.STYLE_PROMPTS:
         raise HTTPException(status_code=400, detail=f"Invalid style: {request.style}")
         
     start_time = time.time()

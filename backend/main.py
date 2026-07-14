@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 
 from core.config import engine, Base
-from api import auth, stats, generate
+from api import auth, stats, generate, styles
 
 # Load environment variables
 load_dotenv()
@@ -37,6 +37,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(stats.router)
 app.include_router(generate.router)
+app.include_router(styles.router)
 
 @app.get("/")
 def read_root():

@@ -41,8 +41,10 @@ on Inference Providers (check the model page's "Inference Providers"
 widget on huggingface.co before relying on it).
 """
 
+import json
 import os
 import time
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -65,40 +67,46 @@ BLINK_EAR_THRESHOLD = 0.21     # lower = eye more closed
 BLINK_CONSEC_FRAMES = 2        # frames below threshold to confirm a real blink (not noise)
 TRIGGER_COOLDOWN_SEC = 1.2     # minimum gap between triggers so one blink = one change
 
+STYLE_CONFIG_FILE = Path(__file__).resolve().parent / "backend" / "services" / "style_prompts.json"
+
 PROMPT_TEMPLATE = (
     "Portrait of the same person, preserve facial identity and pose, {style} style,\n"
     "strands of hair breaking apart and floating weightlessly upward,\n"
     "loose particles and fabric drifting off the shoulders as if gravity is reversed,\n"
-    "soft upward motion trails, {palette}, {texture}, {lighting},\n"
-    "match the original photo's natural hair color and skin tone exactly, do not alter "
+    "soft upward motion trails, {color} color palette, {texture} texture and medium,\n"
+    "{lighting} lighting, match the original photo's natural hair color and skin tone exactly, do not alter "
     "hair or skin color from the source image,\n"
     "clean refined linework, consistent even line weight, no jitter or broken edges,\n"
     f"close-up headshot, centered composition, high detail, square {ART_SIZE}x{ART_SIZE} output"
 )
 
-STYLE_FILLS = {
-    "vangogh": {
-        "style": "Van Gogh post-impressionist oil painting",
-        "palette": "warm golden yellow and deep cobalt blue background swirls",
-        "texture": "visible canvas texture and thick impasto brushstrokes",
-        "lighting": "dramatic directional lighting",
-    },
-    "neon": {
-        "style": "cyberpunk neon",
-        "palette": "electric magenta and cyan background glow on near-black backdrop",
-        "texture": "glossy synthetic highlight texture",
-        "lighting": "glowing rim light",
-    },
-    "anime": {
-        "style": "Japanese anime cel-shaded",
-        "palette": "bright saturated pastel background palette",
-        "texture": "flat cel-shaded coloring",
-        "lighting": "soft even anime lighting",
-    },
-}
-
-STYLE_PROMPTS = {name: PROMPT_TEMPLATE.format(**fills) for name, fills in STYLE_FILLS.items()}
 STYLE_SEEDS = {"vangogh": 4821, "neon": 9013, "anime": 2277}
+
+
+def _load_style_prompts() -> dict[str, str]:
+    try:
+        with STYLE_CONFIG_FILE.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        raise RuntimeError(f"Style config file not found: {STYLE_CONFIG_FILE}")
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"Invalid JSON in {STYLE_CONFIG_FILE}: {exc.msg}")
+
+    if not isinstance(data, dict):
+        raise RuntimeError("Style config file must contain an object mapping style names to attributes.")
+
+    prompts = {}
+    for name, attrs in data.items():
+        if not isinstance(attrs, dict):
+            raise RuntimeError(f"Style '{name}' must be an object with style attributes.")
+        for field in ("style", "color", "texture", "lighting"):
+            if field not in attrs:
+                raise RuntimeError(f"Style '{name}' missing required field '{field}'.")
+        prompts[name] = PROMPT_TEMPLATE.format(**attrs)
+    return prompts
+
+
+STYLE_PROMPTS = _load_style_prompts()
 STYLE_CYCLE = list(STYLE_PROMPTS.keys())
 
 # ---------------------------------------------------------------------------

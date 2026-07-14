@@ -1,0 +1,72 @@
+{
+  "Van Gogh": {
+    "style": "Van Gogh post-impressionist oil painting",
+    "color": "warm golden yellows and deep cobalt blues",
+    "texture": "swirling thick impasto brushstrokes, visible canvas",
+    "lighting": "dramatic directional",
+    "description": "A textured post-impressionist portrait inspired by Van Gogh."
+  },
+  "Anime": {
+    "style": "Japanese anime cel-shaded",
+    "color": "bright saturated pastel palette",
+    "texture": "clean flat coloring with sharp highlight speculars",
+    "lighting": "large expressive eyes, soft cel-shading",
+    "description": "A clean anime portrait with sharp cel-shaded colors."
+  },
+  "Neon": {
+    "style": "cyberpunk neon",
+    "color": "electric magenta and cyan on near-black background",
+    "texture": "glossy synthetic skin",
+    "lighting": "glowing rim light and light-trail highlights on facial contours",
+    "description": "A futuristic neon-lit cyberpunk face style."
+  },
+  "Pop Art": {
+    "style": "Andy Warhol pop art",
+    "color": "bold flat primary colors (red, yellow, cyan) with high contrast black outlines",
+    "texture": "halftone dot texture, screen-print look",
+    "lighting": "flat even",
+    "description": "A retro pop art portrait with bold colors and graphic textures."
+  },
+  "Graffiti": {
+    "style": "urban graffiti street-art",
+    "color": "vibrant spray-paint palette (orange, purple, teal) with drip effects, bold black outline strokes",
+    "texture": "spray-can texture and stencil edges, brick wall undertone",
+    "lighting": "urban daylight",
+    "description": "A street-art graffiti style with vivid spray-paint textures."
+  },
+  "Watercolor": {
+    "style": "expressive watercolor painting",
+    "color": "soft pastel translucent colors",
+    "texture": "watercolor washes and drips on textured paper",
+    "lighting": "soft diffused lighting",
+    "description": "A soft watercolor portrait with flowing washes and texture."
+  },
+  "Pencil Sketch": {
+    "style": "monochromatic graphite sketch",
+    "color": "black and white graphite tones",
+    "texture": "fine cross-hatching and pencil strokes on paper",
+    "lighting": "dramatic high contrast lighting",
+    "description": "A realistic pencil sketch portrait with strong graphite shading."
+  },
+  "Cyberpunk": {
+    "style": "cyberpunk 2077 sci-fi",
+    "color": "neon city colors",
+    "texture": "high tech metallic and synthetic textures",
+    "lighting": "rainy neon city atmospheric lighting",
+    "description": "A cinematic cyberpunk style with glowing urban color accents."
+  },
+  "3D Cartoon": {
+    "style": "Pixar 3D animated movie",
+    "color": "bright cheerful stylized colors",
+    "texture": "smooth 3D render plasticine texture",
+    "lighting": "soft cinematic studio lighting",
+    "description": "A polished 3D cartoon-style portrait with smooth shading."
+  },
+  "Oil Painting": {
+    "style": "classical Renaissance oil painting",
+    "color": "rich deep earthy colors",
+    "texture": "traditional canvas and oil paint strokes",
+    "lighting": "chiaroscuro dramatic lighting",
+    "description": "A classical oil painting portrait with rich tonal shading."
+  }
+}
