@@ -8,6 +8,7 @@ import { captureAlignedFace } from '../../utils/faceCrop';
 import { ART_STYLES } from '../../data/artStyles';
 import api from '../../services/api';
 import { GestureIndicator } from '../../components/GestureIndicator';
+import { EyeTracker } from '../../components/EyeTracker';
 import '../../styles/studio.css';
 
 type Phase = 'INIT' | 'NO_FACE' | 'FACE_ONLY' | 'READY' | 'GENERATING' | 'SHOWING';
@@ -22,7 +23,7 @@ export const GestureStudio = () => {
   const [hologramPos, setHologramPos] = useState<{ x: number; y: number; w: number; h: number; rot: number } | null>(null);
 
   const { videoRef, startWebcam, stopWebcam } = useWebcam();
-  const { isReady, hasFace, hasBothHands, faceResult, frameBox, currentGesture } = useVision(videoRef);
+  const { isReady, hasFace, hasBothHands, isBlinking, faceResult, frameBox, currentGesture } = useVision(videoRef);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +71,7 @@ export const GestureStudio = () => {
   }, [isReady, hasFace, hasBothHands]);
 
   // Core generation function — uses refs to avoid stale closures
-  const triggerGeneration = useCallback(async () => {
+  const triggerGeneration = useCallback(async (styleIndex = activeStyleIndexRef.current) => {
     if (!hasBothHandsRef.current) return;
     if (isGeneratingRef.current) return;
 
@@ -91,10 +92,9 @@ export const GestureStudio = () => {
       const centerY = ((fb.minY + fb.maxY) / 2) * ch;
       const CARD_W_REC = 340, CARD_H_REC = 260;
       const CARD_W_MIN = 320, CARD_H_MIN = 240;
-      // Use recommended size if container fits it (with 40px margin), else fall back to minimum
       const w = cw >= CARD_W_REC + 40 ? CARD_W_REC : CARD_W_MIN;
       const h = ch >= CARD_H_REC + 40 ? CARD_H_REC : CARD_H_MIN;
-      const rot = (Math.random() * 8) - 4; // random +/- 4 degrees
+      const rot = (Math.random() * 8) - 4;
       setHologramPos({ x: centerX - w / 2, y: centerY - h / 2, w, h, rot });
     }
 
@@ -103,15 +103,15 @@ export const GestureStudio = () => {
       setPhase('GENERATING');
     }
 
-    const styleName = ART_STYLES[activeStyleIndexRef.current].name;
-    const styleSeed = 4242 + activeStyleIndexRef.current * 1337;
+    const styleName = ART_STYLES[styleIndex].name;
+    const styleSeed = 4242 + styleIndex * 1337;
 
     try {
       const response = await api.post('/api/generate/', {
         image: croppedBase64,
         style: styleName,
         model: "flux.2-klein-4b",
-        init_image: hologramSrcRef.current || croppedBase64,
+        init_image: croppedBase64,
         strength: 0.35,
         seed: styleSeed,
         steps: 4
@@ -135,12 +135,13 @@ export const GestureStudio = () => {
     
     if (currentGesture === 'open_palm') {
       setActiveStyleIndex(prev => (prev + 1) % ART_STYLES.length);
+      setPhase('READY');
     } else if (currentGesture === 'closed_fist') {
       setActiveStyleIndex(prev => (prev - 1 + ART_STYLES.length) % ART_STYLES.length);
+      setPhase('READY');
     } else if (currentGesture === 'pointing_up') {
-      // Just a fun trigger, interval generation handles actual generation
+      triggerGeneration(activeStyleIndexRef.current);
     } else if (currentGesture === 'pinch') {
-      // Future feature: Download
       if (hologramSrc) {
         const a = document.createElement('a');
         a.href = hologramSrc;
@@ -148,15 +149,16 @@ export const GestureStudio = () => {
         a.click();
       }
     }
-  }, [currentGesture, hologramSrc, activeStyleIndex]);
+  }, [currentGesture, hologramSrc, triggerGeneration, activeStyleIndex]);
 
-  // Continuous generation loop (approx. 3 fps)
   useEffect(() => {
-    const interval = setInterval(() => {
-      triggerGeneration();
-    }, 350);
-    return () => clearInterval(interval);
-  }, [triggerGeneration]);
+    if (!isBlinking || !hasBothHands || phase === 'INIT' || phase === 'NO_FACE') return;
+
+    const nextIndex = (activeStyleIndexRef.current + 1) % ART_STYLES.length;
+    setActiveStyleIndex(nextIndex);
+    setPhase('READY');
+    triggerGeneration(nextIndex);
+  }, [isBlinking, hasBothHands, phase, triggerGeneration]);
 
   const getFrameGuide = () => {
     if (!frameBox || !containerRef.current || !hasBothHands) return null;
@@ -226,10 +228,17 @@ export const GestureStudio = () => {
           <LogOut className="w-4 h-4" /> Sign Out
         </button>
 
-        <div className={`flex items-center gap-2 bg-black/60 backdrop-blur px-4 py-2 rounded-full border border-white/15 ${status.color}`}>
-          {status.spin && <Loader2 className="w-4 h-4 animate-spin" />}
-          {!status.spin && phase === 'READY' && <Sparkles className="w-4 h-4" />}
-          <span className="text-sm font-semibold">{status.text}</span>
+        <div className={`flex flex-col items-start gap-1 bg-black/60 backdrop-blur px-4 py-2 rounded-full border border-white/15 ${status.color}`}>
+          <div className="flex items-center gap-2">
+            {status.spin && <Loader2 className="w-4 h-4 animate-spin" />}
+            {!status.spin && phase === 'READY' && <Sparkles className="w-4 h-4" />}
+            <span className="text-sm font-semibold">{status.text}</span>
+          </div>
+          {isBlinking && (
+            <span className="text-[11px] text-white/60">
+              Blink detected — cycling to the next style
+            </span>
+          )}
         </div>
 
         <div className="text-right">
@@ -247,6 +256,8 @@ export const GestureStudio = () => {
           className="absolute inset-0 w-full h-full object-cover"
           style={{ transform: 'scaleX(-1)' }}
         />
+
+        <EyeTracker isBlinking={isBlinking} showDebug />
 
         {/* Frame guide with corner brackets */}
         {getFrameGuide()}

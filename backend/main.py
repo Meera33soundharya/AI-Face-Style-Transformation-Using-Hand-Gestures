@@ -1,10 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-import os
 
-from core.config import engine, Base
-from api import auth, stats, generate, styles
+from api import auth, generate, stats, styles
+from core.config import Base, engine
 
 # Load environment variables
 load_dotenv()
@@ -14,8 +13,10 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="AI Gesture-Based Face Transformation API",
-    description="Backend for the AI Gesture-Based Face Transformation Platform",
-    version="1.0.0"
+    description=(
+        "Backend for the AI Gesture-Based Face Transformation Platform"
+    ),
+    version="1.0.0",
 )
 
 # Configure CORS
@@ -39,9 +40,11 @@ app.include_router(stats.router)
 app.include_router(generate.router)
 app.include_router(styles.router)
 
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to AI Gesture-Based Face Transformation API"}
+
 
 @app.get("/health")
 def health_check():

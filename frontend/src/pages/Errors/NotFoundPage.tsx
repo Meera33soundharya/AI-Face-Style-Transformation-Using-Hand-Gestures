@@ -55,9 +55,9 @@ export const NotFoundPage: React.FC = () => {
           >
             <ArrowLeft size={16} /> Go Back
           </Button>
-          <Link to="/dashboard">
+          <Link to="/studio">
             <Button variant="secondary">
-              <Home size={16} /> Dashboard
+              <Home size={16} /> Studio
             </Button>
           </Link>
         </div>

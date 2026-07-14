@@ -43,8 +43,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (token: string) => {
     localStorage.setItem('token', token);
-    // Force a reload or fetch user here. Easiest is to reload for now or fetch:
-    window.location.href = '/dashboard';
+    // Force a reload or fetch user here.
+    window.location.href = '/studio';
   };
 
   const logout = () => {

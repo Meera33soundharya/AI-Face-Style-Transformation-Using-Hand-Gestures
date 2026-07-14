@@ -19,7 +19,6 @@ import { cn } from "../../lib/utils";
 import { Avatar } from "../ui/Avatar";
 
 const navItems = [
-  { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { label: "Studio", path: "/studio", icon: Wand2 },
   { label: "Analytics", path: "/analytics", icon: BarChart3 },
   { label: "Profile", path: "/profile", icon: User },

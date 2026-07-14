@@ -30,7 +30,7 @@ export const ErrorPage: React.FC<ErrorPageProps> = ({ error, reset }) => {
         </h1>
         <p className="text-white/50 text-sm mb-4 leading-relaxed">
           An unexpected error occurred. Our team has been notified. Please try
-          again or return to the dashboard.
+          again or return to the studio.
         </p>
         {error?.message && (
           <div className="text-xs text-red-400/70 bg-red-500/5 border border-red-500/10 rounded-xl p-3 mb-6 font-mono text-left">
@@ -44,9 +44,9 @@ export const ErrorPage: React.FC<ErrorPageProps> = ({ error, reset }) => {
               <RefreshCw size={16} /> Try Again
             </Button>
           )}
-          <Link to="/dashboard">
+          <Link to="/studio">
             <Button variant="secondary">
-              <Home size={16} /> Go Home
+              <Home size={16} /> Go Studio
             </Button>
           </Link>
         </div>

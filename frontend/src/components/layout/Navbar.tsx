@@ -52,7 +52,7 @@ export const Navbar: React.FC = () => {
 
       {/* Logo (mobile) */}
       <Link
-        to="/dashboard"
+        to="/studio"
         className="lg:hidden flex items-center gap-2 flex-shrink-0"
       >
         <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-violet-600 to-pink-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
