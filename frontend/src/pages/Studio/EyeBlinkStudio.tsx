@@ -126,7 +126,7 @@ export const EyeBlinkStudio = () => {
     const next = (styleIndexRef.current + 1) % ART_STYLES.length;
     setBlinkCount(c => c + 1);
     generateImage(next);
-  }, [isBlinking]); // only isBlinking — all other values via refs
+  }, [isBlinking, generateImage]); // generateImage included so it’s never stale
 
   const handleStyleClick = (idx: number) => {
     if (phaseRef.current === 'GENERATING') return;

@@ -7,8 +7,8 @@ import type { FaceLandmarkerResult } from '@mediapipe/tasks-vision';
 // Right eye: p1=362, p2=385, p3=387, p4=263, p5=373, p6=380
 const LEFT_EYE  = [33, 160, 158, 133, 153, 144];
 const RIGHT_EYE = [362, 385, 387, 263, 373, 380];
-const EAR_THRESHOLD = 0.21;
-const BLINK_COOLDOWN_MS = 1000;
+const EAR_THRESHOLD = 0.25;      // raised: works for more people
+const BLINK_COOLDOWN_MS = 1200;  // 1.2s cooldown — one style per blink
 
 function ear(lm: { x: number; y: number }[], idx: number[]): number {
   const p = (i: number) => lm[idx[i]];
@@ -91,10 +91,14 @@ export const useEyeBlink = (videoRef: React.RefObject<HTMLVideoElement | null>) 
           if (now - lastBlinkTimeRef.current > BLINK_COOLDOWN_MS) {
             lastBlinkTimeRef.current = now;
             setIsBlinking(true);
-            setTimeout(() => setIsBlinking(false), 150);
+            setTimeout(() => setIsBlinking(false), 200);
           }
         }
-        eyesClosedRef.current = closed;
+        // Falling edge: eyes reopened — reset so next close fires again
+        if (!closed && eyesClosedRef.current) {
+          eyesClosedRef.current = false;
+        }
+        if (closed) eyesClosedRef.current = true;
       } else {
         setHasFace(false);
         faceResultRef.current = null;
